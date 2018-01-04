@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="data_types">
+        <item>@string/number</item>
+        <item>@string/text</item>
+        <item>@string/media</item>
+        <item>@string/doc</item>
+        <item>@string/link</item>
+        <item>@string/table</item>
+    </string-array>
+
+</resources>

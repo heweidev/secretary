@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Secretary</string>
+
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+
+    <string name="number">数据</string>
+    <string name="text">文本</string>
+    <string name="media">图片</string>
+    <string name="doc">文档</string>
+    <string name="link">链接</string>
+    <string name="table">表格</string>
+
+    <string name="num_input_hint">请输入数值</string>
+    <string name="text_input_hint">请输入文本</string>
+    <string name="title">标题</string>
+    <string name="desc">描述</string>
+    <string name="tag">标签</string>
+</resources>

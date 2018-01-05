@@ -1,9 +1,7 @@
 package com.hewei.secretary;
 
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -15,10 +13,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Locale;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 
@@ -26,12 +22,14 @@ import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
  * Created by fengyinpeng on 2018/1/3.
  */
 
-public class NotesAddActivity extends AppCompatActivity implements View.OnClickListener {
+public class NotesAddActivity extends AppCompatActivity implements View.OnClickListener, NoteAddView {
     private EditText mTitleEdit;
     private EditText mTagEdit;
     private EditText mDescEdit;
     private TextView mTagsView;
     private HashSet<String> mTags = new HashSet<>();
+
+    private NoteAddPresenter mPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,6 +40,9 @@ public class NotesAddActivity extends AppCompatActivity implements View.OnClickL
         mDescEdit = findViewById(R.id.desc);
         mTagEdit = findViewById(R.id.et_tag);
         mTagsView = findViewById(R.id.tags);
+
+        mPresenter = new AddtoDatabasePresenter();
+        mPresenter.bindView(this);
 
         mTagEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -116,64 +117,8 @@ public class NotesAddActivity extends AppCompatActivity implements View.OnClickL
             return null;
         }
 
-        String[] tags = new String[mTags.size()];
-        mTags.toArray(tags);
-        return addNote(title, desc, tags);
-    }
-
-    private String addNote(String title, String desc, String... tags) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.CHINA);
-        String strDate = dateFormat.format(new Date());
-
-        ContentValues values = new ContentValues();
-        values.put(Constants.TITLE, title);
-        values.put(Constants.DESC, desc);
-        values.put(Constants.DATE, strDate);
-
-        if (tags != null) {
-            for (int i = 0; i < Math.min(Constants.MAX_TAG_NUMBER, tags.length); i++) {
-                values.put("tag" + (i+1), tags[i]);
-            }
-        }
-
-        Uri uri = getContentResolver().insert(NotesProvider.URI_NOTES, values);
-        return uri.getLastPathSegment();
-    }
-
-    private void addNumber(double va) {
-        String id = addNote();
-        if (id == null) {
-            return;
-        }
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.CHINA);
-        String strDate = dateFormat.format(new Date());
-
-        ContentValues dataValue = new ContentValues();
-        dataValue.put(Constants.DATA_TYPE, Constants.DT_NUMBER);
-        dataValue.put(Constants.NUM_DATA, va);
-        dataValue.put(Constants.NOTE_ID, id);
-        dataValue.put(Constants.DATE, strDate);
-
-        getContentResolver().insert(NotesProvider.URI_DATA, dataValue);
-    }
-
-    private void addText(String s) {
-        String id = addNote();
-        if (id == null) {
-            return;
-        }
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss", Locale.CHINA);
-        String strDate = dateFormat.format(new Date());
-
-        ContentValues dataValue = new ContentValues();
-        dataValue.put(Constants.DATA_TYPE, Constants.DT_STRING);
-        dataValue.put(Constants.STRING_DATA, s);
-        dataValue.put(Constants.NOTE_ID, id);
-        dataValue.put(Constants.DATE, strDate);
-
-        getContentResolver().insert(NotesProvider.URI_DATA, dataValue);
+        mPresenter.addNote(title, desc, new ArrayList<>(mTags));
+        return "";
     }
 
     private void showInputDialog(final int tag, @StringRes int hint) {
@@ -186,10 +131,10 @@ public class NotesAddActivity extends AppCompatActivity implements View.OnClickL
                     if (tag == 0) {
                         try {
                             double va = Double.parseDouble(editText.getText().toString());
-                            addNumber(va);
+                            //addNumber(va);
                         } catch (Exception e) {}
                     } else if (tag == 1) {
-                        addText(editText.getText().toString());
+                        //addText(editText.getText().toString());
                     }
                 }
             }
@@ -201,5 +146,15 @@ public class NotesAddActivity extends AppCompatActivity implements View.OnClickL
                 .setPositiveButton(R.string.ok, listener)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    @Override
+    public void onAddFinish() {
+
+    }
+
+    @Override
+    public void onAddError() {
+
     }
 }

@@ -36,8 +36,9 @@ public class Constants {
     public static final int DT_STRING = 2;
     public static final int DT_URI = 3;
     public static final int DT_TIME = 4;
+    public static final int DT_BOOLEAN = 5;
 
     // container type
     public static final int DT_LIST = 100;
-    public static final int DT_SET = 101;
+    public static final int DT_MAP = 101;
 }

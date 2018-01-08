@@ -6,15 +6,23 @@ const url = require('url');
 const {ObjectID} = require('mongodb');
 
 router.get('/listNotes', function (req, res, next) {
-    var searchKey = url.parse(req.url).query.substr(4) || '';
-    doSearch(searchKey).then(function(values){
+    var query = url.parse(req.url, true).query;
+    console.log(query);
+    var queryParam = null;
+    if (query.id) {
+        queryParam = {_id: new ObjectID(query.id)};
+    } else if (query.key) {
+        queryParam = {title: {$regex: query.key}};
+    }
+
+    doSearch(queryParam).then(function(values){
         res.json(values);
     }).catch(function(err){
         res.json({err: err});
     });
 });
 
-function doSearch(searchKey) {
+function doSearch(queryParam) {
     const db = dbHelper.getDb();
     if (!db) {
         throw new Error('db not ready!');
@@ -24,10 +32,10 @@ function doSearch(searchKey) {
     const data = db.collection('data');
 
     var findRet;
-    if (searchKey == '') {
+    if (!queryParam) {
         findRet = collection.find();
     } else {
-        findRet = collection.find({title: {$regex: searchKey}});
+        findRet = collection.find(queryParam);
     }
     
     return findRet.toArray().then(
@@ -87,7 +95,7 @@ router.post('/addNote', function(req, res, next) {
 });
 
 router.post('/addData', function(req, res, next) {
-    var noteId = url.parse(req.url).query.substr(3) || '';
+    var noteId = url.parse(req.url, true).query.id;
 
     const db = dbHelper.getDb();
     if (!db) {

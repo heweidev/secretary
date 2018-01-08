@@ -23,6 +23,8 @@ public class TemplateMap {
             return new StringTemplate(data);
         } else if (type == Constants.DT_URI) {
             return FileTemplate.CREATOR.createFromString(data);
+        } else if (type == Constants.DT_LIST) {
+            return ListTemplate.CREATOR.createFromString(data);
         }
 
         return null;

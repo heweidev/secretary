@@ -2,6 +2,8 @@ package com.hewei.secretary;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -13,8 +15,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hewei.secretary.note.FileTemplate;
+import com.hewei.secretary.note.ListTemplate;
+import com.hewei.secretary.note.Note;
+import com.hewei.secretary.note.NoteTemplate;
+
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+
+import me.nereo.multi_image_selector.MultiImageSelector;
+import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 
@@ -23,6 +34,7 @@ import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
  */
 
 public class NotesAddActivity extends AppCompatActivity implements View.OnClickListener, NoteAddView {
+    private static final int REQUEST_IMAGE = 10001;
     private EditText mTitleEdit;
     private EditText mTagEdit;
     private EditText mDescEdit;
@@ -82,23 +94,60 @@ public class NotesAddActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void showDataTypeSelectDialog() {
+        /*
+        <item>@string/text</item>
+        <item>@string/media</item>
+        <item>@string/doc</item>
+        <item>@string/link</item>
+        <item>@string/table</item>
+         */
         new AlertDialog.Builder(this).setItems(R.array.data_types,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
-                            showInputDialog(which, R.string.num_input_hint);
-                        } else if (which == 1) {
                             showInputDialog(which, R.string.text_input_hint);
+                        } else if (which == 1) {
+                            MultiImageSelector.create(NotesAddActivity.this)
+                                    .showCamera(true)
+                                    .count(100)
+                                    .multi()
+                                    .start(NotesAddActivity.this, REQUEST_IMAGE);
                         } else if (which == 2) {
 
                         } else if (which == 3) {
 
-                        } else if (which == 4) {
-
                         }
                     }
                 }).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_CANCELED) {
+            return;
+        }
+
+        if (REQUEST_IMAGE == requestCode) {
+            List<String> paths = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+            if (paths == null || paths.isEmpty()) {
+                return;
+            }
+
+            NoteTemplate noteData;
+            if (paths.size() == 1) {
+                noteData = new FileTemplate(Uri.parse("file://" + paths.get(0)), "image/jpeg", "");
+            } else {
+                List<FileTemplate> listData = new ArrayList<>();
+                for (String p :paths) {
+                    FileTemplate item = new FileTemplate(Uri.parse("file://" + p), "image/jpeg", "");
+                    listData.add(item);
+                }
+                noteData = new ListTemplate<>(listData);
+            }
+
+            mPresenter.addData(noteData);
+        }
     }
 
     private String addNote() {
@@ -117,7 +166,8 @@ public class NotesAddActivity extends AppCompatActivity implements View.OnClickL
             return null;
         }
 
-        mPresenter.addNote(title, desc, new ArrayList<>(mTags));
+        Note note = new Note(title, desc, new ArrayList<>(mTags));
+        mPresenter.addNote(note);
         return "";
     }
 
@@ -154,7 +204,11 @@ public class NotesAddActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    public void onAddError() {
-
+    public void onAddError(Throwable t) {
+        String msg = t.getMessage();
+        if (TextUtils.isEmpty(msg)) {
+            msg = "add error!";
+        }
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }

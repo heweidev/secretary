@@ -9,6 +9,10 @@ import com.hewei.secretary.Constants;
 public class Number extends NoteTemplate {
     private double mData;
 
+    public Number(double d) {
+        mData = d;
+    }
+
     @Override
     public String getData() {
         return String.valueOf(mData);
@@ -22,8 +26,7 @@ public class Number extends NoteTemplate {
     public static final Creator<Number> CREATOR = new Creator<Number>() {
         @Override
         public Number createFromString(String source) throws Exception {
-            Number number = new Number();
-            number.mData = Double.parseDouble(source);
+            Number number = new Number(Double.parseDouble(source));
             return number;
         }
 

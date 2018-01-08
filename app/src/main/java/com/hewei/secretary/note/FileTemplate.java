@@ -15,6 +15,12 @@ public class FileTemplate extends NoteTemplate {
     public Uri uri;
     public String desc;
 
+    public FileTemplate(Uri uri, String contentType, String desc) {
+        this.uri = uri;
+        this.contentType = contentType;
+        this.desc = desc;
+    }
+
     @Override
     public String getData() {
         JSONObject object = new JSONObject();
@@ -37,12 +43,11 @@ public class FileTemplate extends NoteTemplate {
     public static final Creator<FileTemplate> CREATOR = new Creator<FileTemplate>() {
         @Override
         public FileTemplate createFromString(String source) throws Exception {
-            FileTemplate template = new FileTemplate();
             JSONObject object = new JSONObject(source);
-            template.contentType = object.optString("contentType");
-            template.uri = Uri.parse(object.optString("uri"));
-            template.desc = object.optString("desc");
-
+            String contentType = object.optString("contentType");
+            Uri uri = Uri.parse(object.optString("uri"));
+            String desc = object.optString("desc");
+            FileTemplate template = new FileTemplate(uri, contentType, desc);
             return template;
         }
 

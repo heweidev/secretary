@@ -1,15 +1,10 @@
 package com.hewei.secretary;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.net.Uri;
+import android.text.TextUtils;
 
 import com.hewei.secretary.domain.NoteIdRequest;
 import com.hewei.secretary.note.Note;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.hewei.secretary.note.NoteTemplate;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,15 +15,18 @@ import retrofit2.Response;
  */
 
 interface NoteAddPresenter {
-    public void bindView(NoteAddView view);
+    void bindView(NoteAddView view);
     void addNote(Note note);
+    void addData(NoteTemplate data);
+    void addNote(Note note, NoteTemplate data);
 }
 
 interface NoteAddView {
     void onAddFinish();
-    void onAddError();
+    void onAddError(Throwable throwable);
 }
 
+/*
 class AddtoProviderPresenter implements NoteAddPresenter {
     public ContentResolver mContentResolver;
 
@@ -97,8 +95,7 @@ class AddtoProviderPresenter implements NoteAddPresenter {
 
         mContentResolver.insert(NotesProvider.URI_DATA, dataValue);
     }
-    */
-}
+}   */
 
 class AddtoDatabasePresenter implements NoteAddPresenter {
     private NoteAddView mView;
@@ -121,7 +118,55 @@ class AddtoDatabasePresenter implements NoteAddPresenter {
             @Override
             public void onFailure(Call<NoteIdRequest> call, Throwable t) {
                 if (mView != null) {
-                    mView.onAddError();
+                    mView.onAddError(t);
+                }
+            }
+        });
+    }
+
+    private void addDataImpl(NoteTemplate data) {
+        Network.getInstance().getApi().addData(data).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (mView != null) {
+                    mView.onAddFinish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                if (mView != null) {
+                    mView.onAddError(t);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void addData(NoteTemplate data) {
+        if (TextUtils.isEmpty(data.noteId)) {
+            if (mView != null) {
+                mView.onAddError(new Exception("noteId is null"));
+            }
+            return;
+        }
+
+        addDataImpl(data);
+    }
+
+    @Override
+    public void addNote(Note note, final NoteTemplate data) {
+        Network.getInstance().getApi().addNote(note).enqueue(new Callback<NoteIdRequest>() {
+            @Override
+            public void onResponse(Call<NoteIdRequest> call, Response<NoteIdRequest> response) {
+                data.noteId = response.body().id;
+                addDataImpl(data);
+            }
+
+            @Override
+            public void onFailure(Call<NoteIdRequest> call, Throwable t) {
+                if (mView != null) {
+                    mView.onAddError(t);
                 }
             }
         });

@@ -5,7 +5,6 @@ import com.hewei.secretary.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -15,6 +14,10 @@ import java.util.Map;
 
 public class MapTemplate extends NoteTemplate {
     private Map<String, ? extends NoteTemplate> mData;
+
+    public MapTemplate(Map<String, ? extends NoteTemplate> data) {
+        mData = data;
+    }
 
     @Override
     public String getData() {
@@ -38,9 +41,6 @@ public class MapTemplate extends NoteTemplate {
     public static final Creator<MapTemplate> CREATOR = new Creator<MapTemplate>() {
         @Override
         public MapTemplate createFromString(String source) throws Exception {
-            MapTemplate template = new MapTemplate();
-            template.mData = new HashMap<>();
-
             JSONObject object = new JSONObject(source);
             Iterator<String> iter = object.keys();
 
@@ -49,7 +49,7 @@ public class MapTemplate extends NoteTemplate {
                 //template.mData.put(key, object.getJSONObject(iter.next()));
             }
 
-            return template;
+            return null;
         }
 
         @Override

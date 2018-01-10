@@ -22,7 +22,7 @@ interface NoteAddPresenter {
 }
 
 interface NoteAddView {
-    void onAddFinish();
+    void onAddFinish(String id);
     void onAddError(Throwable throwable);
 }
 
@@ -111,7 +111,7 @@ class AddtoDatabasePresenter implements NoteAddPresenter {
             @Override
             public void onResponse(Call<NoteIdRequest> call, Response<NoteIdRequest> response) {
                 if (mView != null) {
-                    mView.onAddFinish();
+                    mView.onAddFinish(response.body().id);
                 }
             }
 
@@ -129,7 +129,7 @@ class AddtoDatabasePresenter implements NoteAddPresenter {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (mView != null) {
-                    mView.onAddFinish();
+                    mView.onAddFinish(response.body());
                 }
             }
 

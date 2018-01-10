@@ -9,6 +9,8 @@ public class Constants {
 
     public static final int MAX_TAG_NUMBER = 6;
 
+    public static final String CONTENT_TYPE_JPEG = "image/jpeg";
+
 
     public static final String TAG1 = "tag1";
     public static final String TAG2 = "tag2";
@@ -32,13 +34,26 @@ public class Constants {
     public static final String EXTRA6 = "extra6";
 
     // basic type
+    public static final int DT_UNKNOWN = -1;
     public static final int DT_NUMBER = 1;
     public static final int DT_STRING = 2;
     public static final int DT_URI = 3;
     public static final int DT_TIME = 4;
     public static final int DT_BOOLEAN = 5;
+    public static final int DT_MAP = 6;
 
-    // container type
-    public static final int DT_LIST = 100;
-    public static final int DT_MAP = 101;
+    // container type 不允许嵌套， 容器的数据项只允许是基础类型
+    public static final int DT_LIST = 0x100;
+
+    public static int listType(int dt) {
+        return DT_LIST + (dt & 0xff);
+    }
+
+    public static int itemType(int dt) {
+        return dt & 0xff;
+    }
+
+    public static boolean isList(int dt) {
+        return dt == Constants.DT_LIST;
+    }
 }

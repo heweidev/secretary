@@ -2,17 +2,12 @@ package com.hewei.secretary.note;
 
 import android.os.Parcelable;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created by fengyinpeng on 2018/1/5.
  */
 
 public abstract class NoteTemplate {
-    @SerializedName("data")
     public abstract String getData();
-
-    @SerializedName("type")
     public abstract int getType();
 
 

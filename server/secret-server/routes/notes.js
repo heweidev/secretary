@@ -7,19 +7,62 @@ const {ObjectID} = require('mongodb');
 
 router.get('/listNotes', function (req, res, next) {
     var query = url.parse(req.url, true).query;
-    console.log(query);
     var queryParam = null;
     if (query.id) {
         queryParam = {_id: new ObjectID(query.id)};
     } else if (query.key) {
         queryParam = {title: {$regex: query.key}};
     }
-
+    
     doSearch(queryParam).then(function(values){
         res.json(values);
     }).catch(function(err){
         res.json({err: err});
     });
+});
+
+router.get('/getNote', function(req, res, next){
+    const db = dbHelper.getDb();
+    if (!db) {
+        throw new Error('db not ready!');
+    }
+
+    var query = url.parse(req.url, true).query;
+    if (!query.id) {
+        res.json(err.p_err('invalid id param'));
+        return;
+    }
+
+    var noteId;
+    try {
+        noteId = new ObjectID(query.id);    
+    } catch(e) {
+        res.json(err.p_err('invalid id param'));
+        return;
+    }
+
+    const collection = db.collection('notes');
+    const data = db.collection('data');
+
+    return collection.findOne({_id: noteId})
+        .then(function (note) {
+            return data.find({
+                    noteId: noteId
+                }).toArray().then(function (itemList) {
+                    for (i in itemList) {
+                        if (itemList[i].data instanceof Object) {
+                            var obj = itemList[i].data;
+                            itemList[i].data = JSON.stringify(obj);
+                        }
+                    }
+                    note.data = itemList;
+                    return Promise.resolve(note);
+                });
+        }).then(function(note){
+            res.json(note);
+        }).catch(function(err){
+            res.json(err.p_err(err));
+        });
 });
 
 function doSearch(queryParam) {
@@ -29,29 +72,14 @@ function doSearch(queryParam) {
     }
 
     const collection = db.collection('notes');
-    const data = db.collection('data');
-
     var findRet;
     if (!queryParam) {
         findRet = collection.find();
     } else {
-        findRet = collection.find(queryParam);
+        findRet = collection.find(queryParam, {data: 0});
     }
     
-    return findRet.toArray().then(
-        function (notes) {
-            return Promise.all(notes.map(function (note) {
-                console.log('query ' + note._id);
-
-                return data.find({
-                        noteId: new ObjectID(note._id)
-                    }).toArray().then(function (itemList) {
-                        console.log('query ' + note._id + ' finished!');
-                        note.data = itemList;
-                        return Promise.resolve(note);
-                    });
-            }));
-        });
+    return findRet.toArray();
 }
 
 router.post('/addNote', function(req, res, next) {
@@ -62,11 +90,11 @@ router.post('/addNote', function(req, res, next) {
 
     const body = req.body;
     if (!body) {
-        res.json(err.param_err('no data'));
+        res.json(err.p_err('no data'));
         return;
     }
     if (!body.title || body.title.length == 0) {
-        res.json(err.param_err('title can not be null'));
+        res.json(err.p_err('title can not be null'));
         return;
     }
 
@@ -95,19 +123,20 @@ router.post('/addNote', function(req, res, next) {
 });
 
 router.post('/addData', function(req, res, next) {
-    var noteId = url.parse(req.url, true).query.id;
-
+    var itemData = req.body;
+    var noteId;
+    try {
+        noteId = new ObjectID(itemData.id)
+    } catch(e) {
+        res.json(err.p_err('note id is empty!'));
+        return;
+    
+    }
+    itemData.noteId = noteId;
     const db = dbHelper.getDb();
     if (!db) {
         throw new Error('db not ready!');
     }
-
-    if (noteId == '') {
-        throw Error('id is null');
-    }
-
-    var itemData = req.body;
-    itemData.noteId = new ObjectID(noteId);
 
     const data = db.collection('data');
     data.insertOne(itemData).then(function(doc){
@@ -134,11 +163,11 @@ router.use('/', function (req, res, next) {
     } else if (req.method == 'POST') {
         const body = req.body;
         if (!body) {
-            res.json(err.param_err('no data'));
+            res.json(err.p_err('no data'));
             return;
         }
         if (!body.title || body.title.length == 0) {
-            res.json(err.param_err('title can not be null'));
+            res.json(err.p_err('title can not be null'));
             return;
         }
 

@@ -23,17 +23,25 @@ public class ListTemplate<T extends NoteTemplate> extends NoteTemplate {
         return mData.get(position);
     }
 
+    public List<T> getItems() {
+        return mData;
+    }
+
+    public int size() {
+        return mData.size();
+    }
+
     @Override
     public String getData() {
         if (mData == null || mData.isEmpty()) {
-            return "{}";
+            return "[]";
         }
 
         JSONArray array = new JSONArray();
         int i = 0;
         try {
             for (T d: mData) {
-                array.put(i++, new JSONObject(d.getData()));
+                array.put(i++, d.getData());
             }
         } catch (Exception e) {}
 
@@ -42,19 +50,21 @@ public class ListTemplate<T extends NoteTemplate> extends NoteTemplate {
 
     @Override
     public int getType() {
-        return Constants.DT_LIST;
+        return mData == null || mData.isEmpty() ?
+                Constants.DT_LIST : Constants.listType(mData.get(0).getType());
     }
 
     public static final Creator<ListTemplate<? extends NoteTemplate>> CREATOR = new Creator<ListTemplate<? extends NoteTemplate>>() {
         @Override
         public ListTemplate<? extends NoteTemplate> createFromString(String source) throws Exception {
             ArrayList<NoteTemplate> list = new ArrayList();
-            JSONArray array = new JSONArray(source);
+            JSONObject object = new JSONObject(source);
+            int dt = object.getInt("type");
+            int itemType = Constants.itemType(dt);
+            JSONArray array = object.getJSONArray("data");
             int count = array.length();
             for (int i = 0; i < count; i++) {
-                JSONObject object = array.getJSONObject(i);
-                int type = object.getInt("type");
-                list.add(TemplateMap.getTemplate(type, object.toString()));
+                list.add(TemplateMap.getTemplate(itemType, array.getString(i)));
             }
 
             ListTemplate template = new ListTemplate(list);

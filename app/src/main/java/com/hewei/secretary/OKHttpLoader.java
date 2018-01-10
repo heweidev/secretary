@@ -2,7 +2,6 @@ package com.hewei.secretary;
 
 import android.content.Context;
 import android.support.v4.content.Loader;
-import android.util.Log;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -14,6 +13,11 @@ import retrofit2.Response;
 
 public class OKHttpLoader<T> extends Loader<T> {
     private Call<T> mCall;
+    private OnLoadErrorListener mErrorListener;
+
+    public interface OnLoadErrorListener {
+        void onLoadError(Throwable t);
+    }
 
     /**
      * Stores away the application context associated with context.
@@ -25,14 +29,17 @@ public class OKHttpLoader<T> extends Loader<T> {
      *
      * @param context used to retrieve the application context.
      */
-    public OKHttpLoader(Context context, Call<T> call) {
+    public OKHttpLoader(Context context, Call<T> call, OnLoadErrorListener listener) {
         super(context);
         mCall = call;
+        mErrorListener = listener;
     }
 
     @Override
     protected void onStartLoading() {
-        super.onStartLoading();
+        if (mCall.isExecuted()) {
+            return;
+        }
 
         mCall.enqueue(new Callback<T>() {
             @Override
@@ -42,7 +49,9 @@ public class OKHttpLoader<T> extends Loader<T> {
 
             @Override
             public void onFailure(Call<T> call, Throwable t) {
-                deliverError(t);
+                if (mErrorListener != null) {
+                    mErrorListener.onLoadError(t);
+                }
             }
         });
     }
@@ -55,6 +64,7 @@ public class OKHttpLoader<T> extends Loader<T> {
 
     @Override
     protected void onForceLoad() {
+        mCall = mCall.clone();
         onStartLoading();
     }
 
@@ -66,9 +76,5 @@ public class OKHttpLoader<T> extends Loader<T> {
     @Override
     protected void onReset() {
         mCall = null;
-    }
-
-    public void deliverError(Throwable t) {
-        Log.d("OKHttpLoader", t.getMessage());
     }
 }

@@ -11,17 +11,19 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hewei.secretary.note.Note;
 
 import java.util.List;
 
 public class Main2Activity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Note>>,
-        View.OnClickListener {
+        View.OnClickListener, AdapterView.OnItemClickListener, OKHttpLoader.OnLoadErrorListener {
     private NotesAdapter mAdapter;
     private ListView mListView;
 
@@ -51,7 +53,8 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
         });
 
         mListView = findViewById(R.id.list);
-        getSupportLoaderManager().restartLoader(0, null, this);
+        mListView.setOnItemClickListener(this);
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     public void doSearch(String str) {
@@ -76,7 +79,7 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
             searchKey = args.getString("search_key");
         }
 
-        return new OKHttpLoader<>(getApplicationContext(), Network.getInstance().getApi().listNotes(searchKey));
+        return new OKHttpLoader<>(getApplicationContext(), Network.getInstance().getApi().listNotes(searchKey), this);
     }
 
     @Override
@@ -93,6 +96,20 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
     @Override
     public void onLoaderReset(Loader<List<Note>> loader) {
 
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Note note = mAdapter.getItem(position);
+        Intent intent = new Intent(this, NoteDetailsActivity.class);
+        intent.putExtra("id", note.id);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onLoadError(Throwable t) {
+        t.printStackTrace();
+        Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     private static final class ViewHolder {

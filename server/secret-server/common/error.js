@@ -13,7 +13,7 @@ function param_err(msg) {
     }
 }
 
-module.export = {
+module.exports = {
    err: err,
    p_err: param_err 
 };

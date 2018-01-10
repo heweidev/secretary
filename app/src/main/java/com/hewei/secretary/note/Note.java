@@ -1,5 +1,7 @@
 package com.hewei.secretary.note;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 import java.util.List;
 
@@ -27,14 +29,14 @@ public class Note {
         this.title = title;
         this.desc = desc;
         this.tags = tags;
-
-        date = new Date().toString();
     }
 
+    @SerializedName("_id")
+    public String id;
     public String title;
     public String desc;
     public List<String> tags;
-    public String date;
+    public Date date;
 
     public List<NoteTemplate> data;
 }

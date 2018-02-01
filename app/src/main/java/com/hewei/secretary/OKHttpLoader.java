@@ -44,12 +44,14 @@ public class OKHttpLoader<T> extends Loader<T> {
         mCall.enqueue(new Callback<T>() {
             @Override
             public void onResponse(Call<T> call, Response<T> response) {
-                deliverResult(response.body());
+                if (!call.isCanceled()) {
+                    deliverResult(response.body());
+                }
             }
 
             @Override
             public void onFailure(Call<T> call, Throwable t) {
-                if (mErrorListener != null) {
+                if (mErrorListener != null && !call.isCanceled()) {
                     mErrorListener.onLoadError(t);
                 }
             }

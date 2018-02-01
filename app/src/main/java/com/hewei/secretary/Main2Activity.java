@@ -22,6 +22,11 @@ import com.hewei.secretary.note.Note;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+
 public class Main2Activity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Note>>,
         View.OnClickListener, AdapterView.OnItemClickListener, OKHttpLoader.OnLoadErrorListener {
     private NotesAdapter mAdapter;
@@ -52,9 +57,22 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
             }
         });
 
-        mListView = findViewById(R.id.list);
+        mListView = (ListView) findViewById(R.id.list);
         mListView.setOnItemClickListener(this);
         getSupportLoaderManager().initLoader(0, null, this);
+
+        request(Network.getInstance().getApi().listNotes(""))
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<List<Note>>() {
+                    @Override
+                    public void accept(List<Note> notes) throws Exception {
+
+                    }
+                });
+    }
+
+    public <T> Observable<T> request(final Call<T> rawCall) {
+        return ObservableLoader.create(getApplicationContext(), getSupportLoaderManager(), rawCall);
     }
 
     public void doSearch(String str) {
@@ -106,6 +124,8 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
         startActivity(intent);
     }
 
+
+
     @Override
     public void onLoadError(Throwable t) {
         t.printStackTrace();
@@ -114,9 +134,9 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
 
     private static final class ViewHolder {
         public ViewHolder(View root) {
-            titleView = root.findViewById(R.id.title);
-            descView = root.findViewById(R.id.desc);
-            tagView = root.findViewById(R.id.tags);
+            titleView = (TextView) root.findViewById(R.id.title);
+            descView = (TextView) root.findViewById(R.id.desc);
+            tagView = (TextView) root.findViewById(R.id.tags);
         }
 
         TextView titleView;

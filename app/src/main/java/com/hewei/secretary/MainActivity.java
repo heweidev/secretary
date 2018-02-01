@@ -101,9 +101,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final class ViewHolder {
         public ViewHolder(View root) {
-            titleView = root.findViewById(R.id.title);
-            descView = root.findViewById(R.id.desc);
-            tagView = root.findViewById(R.id.tags);
+            titleView = (TextView) root.findViewById(R.id.title);
+            descView = (TextView) root.findViewById(R.id.desc);
+            tagView = (TextView) root.findViewById(R.id.tags);
         }
 
         TextView titleView;

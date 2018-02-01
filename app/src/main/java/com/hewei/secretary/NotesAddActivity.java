@@ -38,10 +38,10 @@ public class NotesAddActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_notes);
 
-        mTitleEdit = findViewById(R.id.title);
-        mDescEdit = findViewById(R.id.desc);
-        mTagEdit = findViewById(R.id.et_tag);
-        mTagsView = findViewById(R.id.tags);
+        mTitleEdit = (EditText) findViewById(R.id.title);
+        mDescEdit = (EditText) findViewById(R.id.desc);
+        mTagEdit = (EditText) findViewById(R.id.et_tag);
+        mTagsView = (TextView) findViewById(R.id.tags);
 
         mPresenter = new AddtoDatabasePresenter();
         mPresenter.bindView(this);

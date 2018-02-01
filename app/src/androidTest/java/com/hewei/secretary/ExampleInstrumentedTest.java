@@ -9,6 +9,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hewei.secretary.note.FileTemplate;
+import com.hewei.secretary.note.NoteTemplate;
 import com.hewei.secretary.note.tojson.NoteTemplateAdapter;
 
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class ExampleInstrumentedTest {
         FileTemplate fileTemplate = new FileTemplate(Uri.parse("http://localhost/123"), "image/jpeg", "this is desc");
 
         GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(FileTemplate.class, new NoteTemplateAdapter());
+        builder.registerTypeHierarchyAdapter(NoteTemplate.class, new NoteTemplateAdapter());
         // if PointAdapter didn't check for nulls in its read/write methods, you should instead use
         // builder.registerTypeAdapter(Point.class, new PointAdapter().nullSafe());
 

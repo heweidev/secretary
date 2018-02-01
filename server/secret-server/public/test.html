@@ -1,0 +1,183 @@
+<html>  
+<body>  
+<style type="text/css">
+
+body {
+	padding: 0px;
+	margin: 0px;
+}
+
+.testbtn {
+	padding 10px;
+	background-color: gray;
+}
+
+.test {
+	background-color: blue;
+	padding: 10px;
+}
+
+.bigbkg {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.itemgrow {
+	flex-grow: 1;
+	background: blue;
+}
+
+.itemfix {
+	background: green;
+}
+
+</style>
+<script src="base64js.min.js"></script>
+<script language="javascript">  
+
+
+function AndroidQuestionCallJS(data, response) {  
+	alert(data);
+}  
+
+function AndroidRequestSubmitCallback(response) {  
+	alert(response);
+} 
+
+function js2java() {  
+ //var id = wssapp.getQuestions();  
+ //alert(id)
+	//alert(window.location + '\n' + document.location);
+	//runcode('alert("hello")');
+
+	var obj = {
+		a: 1,
+		b: "2",
+	};
+
+	load('test', obj, function(data) {
+		alert('ret:' + data);
+	})
+}  
+
+function invoke(f, start, interval, end) {
+	if (!start) start = 0;
+	if (arguments.length <= 2)
+		setTimeout(f, start);
+	else {
+		setTimeout(repeat, start);
+		function repeat() {
+			var h = setInterval(f, interval);
+			if (end) {
+				setTimeout(function() { clearInterval(h)}, end);
+			}
+		}
+	}
+}
+
+var a = document;
+var _setResultIframe;
+var callback_map = []
+
+_setResultIframe = a.createElement("iframe"),
+        _setResultIframe.id = "__WeixinJSBridgeIframe_SetResult",
+        _setResultIframe.style.display = "none",
+        a.documentElement.appendChild(_setResultIframe),
+
+function load(name, param, callback) {
+	var id = callback_map.length;
+	callback_map[id] = callback;
+
+	_setResultIframe.src = 'app://api/' + name + '?data' + JSON.stringify(param) + '&callback=' + id; 
+}
+
+function runcode(strCode) {
+	var JSONP = document.createElement("script");  
+    JSONP.type = "text/javascript";  
+    JSONP.innerText = strCode;  
+    document.getElementsByTagName("head")[0].appendChild(JSONP);
+}
+
+function timer_proc() {
+	document.getElementById('div').innerHTML = new Date().toTimeString();
+}
+
+var s = '{"rmTitle":"客户经理2级","rmState":"S01","rmQrCodeUrl":"http://test.cfapp.jushenghua.com/wfss/20171122/Rd641defa3f63484b8f1bc05d8060f11c.jpg","rmHeadImgId":"Ra0c4a0bc185e46b19bed632f9dad694e","rmHeadImgUrl":"http://test.cfapp.jushenghua.com/wfss/20171222/Ra0c4a0bc185e46b19bed632f9dad694e.jpg","rmName":"冯银朋","rmPhone":"13480983718","rmPresent":"android开发一枚~？！！。，。;乐","rmQrCodeId":"Rd641defa3f63484b8f1bc05d8060f11c"}';
+
+//var base64 = new Base64();
+var data = JSON.parse(s).rmName;
+alert(data);
+
+//invoke(timer_proc, 0, 1000, 5000);
+</script>  
+
+<!--
+<a href="#" onClick="js2java()">js2java </a>
+  
+<div id="div" class="test">  
+<font color="#FF0000">this is a hide div~~~~</font>  
+</div>  
+<div>
+	<span class="testbtn">Hello</span>
+	<span class="testbtn">World</span>
+</div>
+-->
+
+
+
+<!--
+<p>骑行天下
+
+
+看看世界有多大</p><p>骑行天下
+
+
+看看世界有多大</p>
+-->
+
+<img src="http://forum.zhe-feng.com.tw/attachments/month_0709/20070915_d62136ec34683b49ae87pK2Zv3vDNeiT.png"></img>
+
+<div class="bigbkg">
+	<div class="itemgrow">
+		<h1>Hello</h1>
+	</div>
+	<div class="itemgrow">
+		<h1>Hello</h1>
+	</div>
+	<div class="itemfix">
+	<!--
+		<p>This is a big param.</p>
+		-->
+	</div>
+</div>
+<div id='content'>
+Hello World!
+<img src="" />
+</div>
+
+<a href="http://weixin.qq.com/r/YEgpMZ3EkcDurdlS9x1y">警民通</a>
+
+<script>
+	(function(){
+		var ps = document.getElementsByTagName('p');
+		var content = null;
+		if (ps && ps.length > 0) {
+			var i = 0;
+			while (i++ < ps.length) {
+				content = ps[i].textContent;
+				if (content != null && content.length > 0) {
+					break;
+				}
+			}
+		}
+		
+		if (content == null || content.length == 0) {
+			content = document.getElementById('content').textContent;
+		}
+		
+		//window.location.href = "re-callback://summary/?data=" + encodeURI(content);
+	})();
+</script>
+
+</body>  

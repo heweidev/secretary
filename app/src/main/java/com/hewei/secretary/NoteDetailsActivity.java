@@ -95,7 +95,7 @@ public class NoteDetailsActivity extends AppCompatActivity implements LoaderMana
         public View createView(int position, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View rootView = inflater.inflate(R.layout.string_item, parent, false);
-            mTextView = rootView.findViewById(R.id.text);
+            mTextView = (TextView) rootView.findViewById(R.id.text);
             return rootView;
         }
 
@@ -137,7 +137,7 @@ public class NoteDetailsActivity extends AppCompatActivity implements LoaderMana
         @Override
         public View createView(int position, ViewGroup parent) {
             View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.images_item, parent, false);
-            mImageGridView = rootView.findViewById(R.id.image_grid);
+            mImageGridView = (ImageGridView) rootView.findViewById(R.id.image_grid);
             return rootView;
         }
 
